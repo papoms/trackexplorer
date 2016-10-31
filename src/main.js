@@ -5,15 +5,7 @@
 
 import Vue from 'vue'
 import App from './App'
-import VueFire from 'vuefire'
 
-// explicit installation required in module environments
-Vue.use(VueFire)
-
-// put this before creating your App instance in main.js
-Vue.filter('reverse', function (array) {
-  return array.slice().reverse()
-})
 new Vue({
   el: '#app',
   render: h => h(App)

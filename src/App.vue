@@ -3,9 +3,9 @@
   <div class="container">
     <div class="row">
       <div class="col-md-12"><h1>Track Explorer</h1></div>
-      <tracklist tracks:="tracks"></tracklist>
     </div>
-    
+    <tracklist></tracklist>
+   
   </div>  
 </div>
   </div>

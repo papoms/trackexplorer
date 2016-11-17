@@ -6,8 +6,8 @@
 import Vue from 'vue'
 import App from './App'
 
-// Vue.config.silent = true
-// console.log = function () {}
+Vue.config.silent = true
+console.log = function () {}
 
 new Vue({
   el: '#app',

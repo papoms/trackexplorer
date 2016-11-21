@@ -67,7 +67,7 @@
       <div class="card thumbnail">
         <div class="hover-btn">
           <a :href="'https://players.turbo.trackmania.com' + track.url" class="btn btn-primary btn-sm" target="_blank">Open</a>
-          <a :href="'https://players.turbo.trackmania.com/ps4/maps/favorites/' + track.url.split('/').pop() + '/add'" class=" btn btn-primary   btn-sm" target="_blank">Add to Favorites</a>
+          <a :href="'https://players.turbo.trackmania.com/' + track.plattform + '/maps/favorites/' + track.url.split('/').pop() + '/add'" class=" btn btn-primary   btn-sm" target="_blank">Add to Favorites</a>
         </div>
         <img class="card-img-top img-fluid" :src="track.img" :alt="track.name">
 

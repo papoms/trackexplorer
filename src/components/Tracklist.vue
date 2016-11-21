@@ -9,11 +9,21 @@
           <div class="form-group orderby">
             <label for="orderBy">Order by: </label>
             <select class="custom-select" id="orderBy" v-model="orderBy">
-              <option value="F">Most Played</option>
+              <option value="F">Most Played (ever)</option>
+              <option value="I">Most Played (recently)</option>
               <option value="G">Most Ratings</option>
-              <option value="H">Bestes Rating</option>
+              <option value="H">Best Rating</option>
             </select>  
           </div>
+
+          <div class="form-group filter filter--type">
+            Platform:
+            <template v-for="filter in availableFiltersPlattform">
+              <input type="checkbox" :id="filter" :value="filter" v-model="filterTrackPlattform">
+              <label :for="filter">{{ filter }}</label>  
+            </template>
+          </div>
+
 
           <div class="form-group filter filter--type">
             Type:
@@ -62,7 +72,7 @@
         <img class="card-img-top img-fluid" :src="track.img" :alt="track.name">
 
         <div class="card-block text-xs-center">
-          <h4 class="card-title">{{ track.name }}</h4>
+          <h4 class="card-title">{{ track.name }} – <span class="tag tag-success">{{ track.plattform }}</span></h4>
           <h6 class="card-subtitle text-muted">by {{ track.author }}</h6>
           <p>
             <span class="tag tag-info">{{ track.type }}</span>
@@ -74,6 +84,10 @@
               <tr>
                 <th scope="row">Plays</th>
                 <td>{{ track.plays }}</td>
+              </tr>
+              <tr>
+                <th scope="row">Recent</th>
+                <td>{{ track.playsdiff }}</td>
               </tr>
               <tr>
                 <th scope="row">Votes</th>
@@ -111,6 +125,10 @@
       return {
         // Example Tracks
         orderBy: 'F', // F: Plays, G: Ratings, H: Rating
+
+        // Type Filter
+        filterTrackPlattform: ['ps4'],
+        availableFiltersPlattform: ['ps4', 'xb1', 'pc'],
 
         // Type Filter
         filterTrackTypes: [],
@@ -181,6 +199,20 @@
           whereString += queryString
         }
 
+        if (this.filterTrackPlattform.length && this.filterTrackPlattform.length !== this.availableFiltersPlattform.length) {
+          // If this is the first Filter Add the WHERE Clause t
+          if (whereString.length === 0) {
+            whereString = 'WHERE '
+          } else {
+            whereString += ' AND '
+          }
+
+          let queryString = '(L=\''
+          queryString += this.filterTrackPlattform.join('\' or L=\'')
+          queryString += '\')'
+          whereString += queryString
+        }
+
         console.log(whereString)
 
         if (whereString !== null) {
@@ -193,11 +225,14 @@
     created: function () {
       console.log('created tracklist')
       // Set default URL for Sheetrock
-      Sheetrock.defaults.url = 'https://docs.google.com/spreadsheets/d/14ijhDhUVFCalOFVCzrBaGLuCkBS_JV_AKzu4k7IsfMc/edit#gid=0'
+      Sheetrock.defaults.url = 'https://docs.google.com/spreadsheets/d/1pBUCQIGKxkbPcxHD4RXvHGUx5MXn-3tTpO9Rb-V7mN0/edit#gid=0'
       this.querySheet()
     },
     watch: {
       'orderBy': function () {
+        this.filterHasChanged()
+      },
+      'filterTrackPlattform': function () {
         this.filterHasChanged()
       },
       'filterTrackTypes': function () {
@@ -244,7 +279,7 @@
         this.loadingTracks = true
 
         let defaultParams = {
-          query: query === undefined ? 'select A,B,C,D,E,F,G,H,I,J,K,L,M ' + this.whereQuery + ' order by ' + this.orderBy + ' desc' : query,
+          query: query === undefined ? 'select A,B,C,D,E,F,G,H,I,J,K,L ' + this.whereQuery + ' order by ' + this.orderBy + ' desc' : query,
           fetchSize: 20,
           callback: this.sheetRockDataCallback
         }
@@ -284,8 +319,8 @@
             if (track.trackid === 'trackid') {
               continue
             }
-            track.url = '/ps4/maps/' + track.trackid
-            track.img = 'https://s3-eu-west-1.amazonaws.com/tmturbo-prod-ps4-maps/' + track.trackid + '.jpg'
+            track.url = '/' + track.plattform + '/maps/' + track.trackid
+            track.img = 'https://s3-eu-west-1.amazonaws.com/tmturbo-prod-' + track.plattform + '-maps/' + track.trackid + '.jpg'
             this.tracks.push(track)
           }
         } else {
